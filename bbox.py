@@ -101,15 +101,31 @@ def pred_corner_coord(prediction):
 
 
 def write(x, batches, results, colors, classes):
-    c1 = tuple(x[1:3].int())
-    c2 = tuple(x[3:5].int())
+    c1 = tuple(x[1:3].int())   # top-left
+    c2 = tuple(x[3:5].int())   # bottom-right
     img = results[int(x[0])]
     cls = int(x[-1])
     label = "{0}".format(classes[cls])
     color = random.choice(colors)
-    cv2.rectangle(img, c1, c2,color, 1)
-    t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1 , 1)[0]
-    c2 = c1[0] + t_size[0] + 3, c1[1] + t_size[1] + 4
-    cv2.rectangle(img, c1, c2,color, -1)
-    cv2.putText(img, label, (c1[0], c1[1] + t_size[1] + 4), cv2.FONT_HERSHEY_PLAIN, 1, [225,255,255], 1);
+
+    # ==== PERBESAR BOUNDING BOX ====
+    cv2.rectangle(img, c1, c2, color, 3)  # tebal 3px (lebih besar)
+
+    # ==== PERBESAR LABEL TEXT ====
+    t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_PLAIN, 1.8, 2)[0]
+
+    # ==== TAMBAHKAN PADDING UNTUK LABEL BOX ====
+    c2_label = (c1[0] + t_size[0] + 6, c1[1] + t_size[1] + 8)
+
+    cv2.rectangle(img, c1, c2_label, color, -1)  # background label
+    cv2.putText(
+        img,
+        label,
+        (c1[0], c1[1] + t_size[1] + 2),
+        cv2.FONT_HERSHEY_PLAIN,
+        1.8,
+        (255, 255, 255),
+        2
+    )
+
     return img
